@@ -9,6 +9,7 @@ function main(toMine)
  turtle.up()
 	for i = 0, toMine do
 		checkFuel()
+		checkInventory()
 		checkGravel()
 		turtle.dig()
 		turtle.forward()
@@ -63,6 +64,14 @@ function checkFuel()
 		turtle.select(16)
 		turtle.refuel()
 		turtle.select(1)
+	end
+end
+
+function checkInventory()
+	for i = 1, 16 do
+		if (turtle.getItemCount(i) == 0) then
+			returnHome()
+		end
 	end
 end
 
