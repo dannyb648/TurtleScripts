@@ -7,17 +7,26 @@ blocksTravelled = 0
 
 function main(toMine)
  turtle.up()
+ print("Gone Up")
 	for i = 0, toMine do
 		checkFuel()
-		checkInventory()
+		--checkInventory()
 		checkGravel()
 		turtle.dig()
-		turtle.forward()
+		if (turtle.forward() ~= true) then
+			print("Error moving! Calling horrid code!")
+			blocksTravelled = blocksTravelled - 1
+			-- This means we dont actually increment
+			-- This could be a mistake
+		end
+
+		blocksTravelled = blocksTravelled + 1
 		turtle.digDown()
 		if blocksTravelled % 15 == 5 then
 			placeTorch()
 		end
-		blocksTravelled = blocksTravelled + 1
+		print(blocksTravelled)
+		
 	end
 	returnHome()
 	dropContents()
@@ -26,15 +35,23 @@ function main(toMine)
 end
 
 function returnHome()
+	print("Returning Home")
+	print(blocksTravelled)
 	turtle.turnLeft()
 	turtle.turnLeft()
-	for i = 0, blocksTravelled do
-			turtle.forward()
+	local b = blocksTravelled
+	for i = 1, b do
+			if(turtle.forward() ~= true) then
+				blocksTravelled = blocksTravelled + 1
+				b = b - 1
+			end
+			blocksTravelled = blocksTravelled - 1
 	end
 	turtle.down()
 end
 
 function placeTorch() 
+	print("Placing Torch")
 	turtle.select(15)
 	turtle.placeDown()
 	turtle.select(1)
@@ -43,6 +60,7 @@ end
 function checkGravel()
 	local success, data = turtle.inspect()
 	if (success) then
+		print ("Gravel Infront")
 		if (data.name == "minecraft:gravel") then
 			turtle.dig()
 			os.sleep(1)
@@ -52,6 +70,7 @@ function checkGravel()
 end
 
 function dropContents()
+	print("Dumping Contents")
 	for i = 1, 14 do
 		turtle.select(i)
 		turtle.drop()
@@ -61,17 +80,23 @@ end
 function checkFuel()
 	local x = turtle.getFuelLevel()
 	if (x < 3000) then
+		print("Refueling!")
 		turtle.select(16)
 		turtle.refuel()
+		print("Fuel level now at: "..turtle.getFuelLevel())
 		turtle.select(1)
 	end
 end
 
 function checkInventory()
+	local emptySlot = true
 	for i = 1, 16 do
 		if (turtle.getItemCount(i) == 0) then
-			returnHome()
+			emptySlot = true 
 		end
+	end
+	if (emptySlot == false) then
+		returnHome()
 	end
 end
 
